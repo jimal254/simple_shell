@@ -1,3 +1,22 @@
+// shell.h
+
+#ifndef SHELL_H
+#define SHELL_H
+
+typedef struct {
+    int readfd;  // Assuming this is part of your actual struct, adjust as needed
+} info_t;
+
+// Function prototypes
+int interactive(info_t *info);
+int is_delim(char c, char *delim);
+int _isalpha(int c);
+int _atoi(char *s);
+
+#endif /* SHELL_H */
+
+// shell.c
+
 #include "shell.h"
 
 /**
@@ -8,7 +27,7 @@
  */
 int interactive(info_t *info)
 {
-	return (isatty(STDIN_FILENO) && info->readfd <= 2);
+    return (isatty(STDIN_FILENO) && info->readfd <= 2);
 }
 
 /**
@@ -20,10 +39,10 @@ int interactive(info_t *info)
  */
 int is_delim(char c, char *delim)
 {
-	while (*delim)
-		if (*delim++ == c)
-			return (1);
-	return (0);
+    while (*delim)
+        if (*delim++ == c)
+            return (1);
+    return (0);
 }
 
 /**
@@ -34,7 +53,7 @@ int is_delim(char c, char *delim)
  */
 int _isalpha(int c)
 {
-	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 }
 
 /**
@@ -45,28 +64,33 @@ int _isalpha(int c)
  */
 int _atoi(char *s)
 {
-	int i, sign = 1, flag = 0, output;
-	unsigned int result = 0;
+    if (s == NULL || *s == '\0') {
+        // Handle NULL or empty string case
+        return 0;
+    }
 
-	for (i = 0; s[i] != '\0' && flag != 2; i++)
-	{
-		if (s[i] == '-')
-			sign *= -1;
+    int i, sign = 1, flag = 0, output;
+    unsigned int result = 0;
 
-		if (s[i] >= '0' && s[i] <= '9')
-		{
-			flag = 1;
-			result *= 10;
-			result += (s[i] - '0');
-		}
-		else if (flag == 1)
-			flag = 2;
-	}
+    for (i = 0; s[i] != '\0' && flag != 2; i++)
+    {
+        if (s[i] == '-')
+            sign *= -1;
 
-	if (sign == -1)
-		output = -result;
-	else
-		output = result;
+        if (s[i] >= '0' && s[i] <= '9')
+        {
+            flag = 1;
+            result *= 10;
+            result += (s[i] - '0');
+        }
+        else if (flag == 1)
+            flag = 2;
+    }
 
-	return (output);
+    if (sign == -1)
+        output = -result;
+    else
+        output = result;
+
+    return output;
 }
