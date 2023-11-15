@@ -1,92 +1,85 @@
-#include "shell.h"
+#include "my_shell.h"
 
 /**
- * _myenv - prints the current environment
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- * Return: Always 0
- */
-int _myenv(info_t *info)
-{
-	print_list_str(info->env);
-	return (0);
-}
-
-/**
- * _getenv - gets the value of an environ variable
- * @info: Structure containing potential arguments. Used to maintain
- * @name: env var name
+ * my_puts_err - prints an input string to stderr
+ * @str: the string to be printed
  *
- * Return: the value
+ * Return: Nothing
  */
-char *_getenv(info_t *info, const char *name)
+void my_puts_err(char *str)
 {
-	list_t *node = info->env;
-	char *p;
+    int i = 0;
 
-	while (node)
-	{
-		p = starts_with(node->str, name);
-		if (p && *p)
-			return (p);
-		node = node->next;
-	}
-	return (NULL);
+    if (!str)
+        return;
+    while (str[i] != '\0')
+    {
+        my_putchar_err(str[i]);
+        i++;
+    }
 }
 
 /**
- * _mysetenv - Initialize a new environment variable,
- *             or modify an existing one
- * @info: Structure containing potential arguments. Used to maintain
- *        constant function prototype.
- *  Return: Always 0
+ * my_putchar_err - writes the character c to stderr
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-int _mysetenv(info_t *info)
+int my_putchar_err(char c)
 {
-	if (info->argc != 3)
-	{
-		_eputs("Incorrect number of arguements\n");
-		return (1);
-	}
-	if (_setenv(info, info->argv[1], info->argv[2]))
-		return (0);
-	return (1);
+    static int i;
+    static char buf[WRITE_BUF_SIZE];
+
+    if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+    {
+        write(2, buf, i);
+        i = 0;
+    }
+    if (c != BUF_FLUSH)
+        buf[i++] = c;
+    return 1;
 }
 
 /**
- * _myunsetenv - Remove an environment variable
- * @info: Structure containing potential arguments. Used to maintain
- *        constant function prototype.
- *  Return: Always 0
+ * my_putchar_fd - writes the character c to given fd
+ * @c: The character to print
+ * @fd: The file descriptor to write to
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-int _myunsetenv(info_t *info)
+int my_putchar_fd(char c, int fd)
 {
-	int i;
+    static int i;
+    static char buf[WRITE_BUF_SIZE];
 
-	if (info->argc == 1)
-	{
-		_eputs("Too few arguements.\n");
-		return (1);
-	}
-	for (i = 1; i <= info->argc; i++)
-		_unsetenv(info, info->argv[i]);
-
-	return (0);
+    if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+    {
+        write(fd, buf, i);
+        i = 0;
+    }
+    if (c != BUF_FLUSH)
+        buf[i++] = c;
+    return 1;
 }
 
 /**
- * populate_env_list - populates env linked list
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- * Return: Always 0
+ * my_puts_fd - prints an input string
+ * @str: the string to be printed
+ * @fd: the file descriptor to write to
+ *
+ * Return: the number of characters put
  */
-int populate_env_list(info_t *info)
+int my_puts_fd(char *str, int fd)
 {
-	list_t *node = NULL;
-	size_t i;
+    int i = 0;
 
-	for (i = 0; environ[i]; i++)
-		add_node_end(&node, environ[i], 0);
-	info->env = node;
-	return (0);
+    if (!str)
+        return 0;
+    while (*str)
+    {
+        i += my_putchar_fd(*str++, fd);
+    }
+    return i;
 }
