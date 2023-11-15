@@ -8,7 +8,7 @@
  */
 int isInteractiveMode(info_t *infoStruct)
 {
-    return (isatty(STDIN_FILENO) && infoStruct->readFileDescriptor <= 2);
+    return (isatty(STDIN_FILENO) && infoStruct->readfd <= 2);
 }
 
 /**
@@ -32,10 +32,7 @@ int isDelimiter(char character, char *delimiterString)
  */
 int isAlphaCharacter(int charInput)
 {
-    if ((charInput >= 'a' && charInput <= 'z') || (charInput >= 'A' && charInput <= 'Z'))
-        return (1);
-    else
-        return (0);
+    return ((charInput >= 'a' && charInput <= 'z') || (charInput >= 'A' && charInput <= 'Z'));
 }
 
 /**
